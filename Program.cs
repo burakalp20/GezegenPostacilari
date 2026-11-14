@@ -1,29 +1,55 @@
 ﻿
 using System;
 using System.IO;
+using GezegenPostacilari.Commands;
 using GezegenPostacilari.Parsers;
+using GezegenPostacilari.Robots;
+using GezegenPostacilari.Simulation;
 
-// Harita dosyasını okuyarak robotların başlangıç bilgilerini ekrana yazdırır.
 try
 {
+    // Harita dosyasını okuyarak simülasyon ortamını oluşturur.
     string dosyaYolu = Path.Combine(
         AppContext.BaseDirectory, "TestData", "harita.txt");
 
     HaritaOkuyucu okuyucu = new HaritaOkuyucu();
     var veri = okuyucu.Oku(dosyaYolu);
 
-    Console.WriteLine("HARITA BASARIYLA OKUNDU");
-    Console.WriteLine($"BOYUT: {veri.Harita.Genislik} x {veri.Harita.Yukseklik}");
-    Console.WriteLine($"BASLANGIC ENERJISI: {veri.BaslangicEnerjisi}");
-    Console.WriteLine();
+    Simulasyon simulasyon = new Simulasyon(
+        veri.Harita, veri.Robotlar);
 
-    foreach (var robot in veri.Robotlar)
+    Console.WriteLine("BASLANGIC DURUMU");
+
+    foreach (Robot robot in simulasyon.Robotlar)
     {
         Console.WriteLine(
-            $"ROBOT {robot.Numara} {robot.Govde.Ad} " +
-            $"KONUM {robot.Konum.X} {robot.Konum.Y} " +
-            $"YON {robot.Yon} ENERJI {robot.Enerji} " +
-            $"DURUM {robot.Durum}");
+            $"ROBOT {robot.Numara} KONUM " +
+            $"{robot.Konum.X} {robot.Konum.Y} " +
+            $"YON {robot.Yon} ENERJI {robot.Enerji}");
+    }
+
+    Console.WriteLine();
+
+    Komut ileri = new IleriKomutu(1);
+    Komut sag = new SagKomutu();
+    Komut sol = new SolKomutu();
+
+    // Komutları robot numarası sırasıyla uygular.
+    foreach (Robot robot in simulasyon.Robotlar)
+    {
+        ileri.Uygula(robot, simulasyon);
+        sag.Uygula(robot, simulasyon);
+        sol.Uygula(robot, simulasyon);
+    }
+
+    Console.WriteLine("KOMUTLAR SONRASI");
+
+    foreach (Robot robot in simulasyon.Robotlar)
+    {
+        Console.WriteLine(
+            $"ROBOT {robot.Numara} KONUM " +
+            $"{robot.Konum.X} {robot.Konum.Y} " +
+            $"YON {robot.Yon} ENERJI {robot.Enerji}");
     }
 }
 catch (Exception ex)

@@ -12,8 +12,7 @@ namespace GezegenPostacilari.Models
         public int BaslangicEnerjisi { get; }
         public List<Robot> Robotlar { get; }
 
-        public HaritaVerisi(Harita harita, int baslangicEnerjisi,
-                           List<Robot> robotlar)
+        public HaritaVerisi(Harita harita, int baslangicEnerjisi,List<Robot> robotlar)
         {
             Harita = harita;
             BaslangicEnerjisi = baslangicEnerjisi;

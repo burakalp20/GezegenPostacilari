@@ -28,20 +28,17 @@ namespace GezegenPostacilari.Parsers
                     return satir;
                 }
 
-                throw new FormatException(
-                    $"{satirlar.Length + 1}. satır: Beklenen veri bulunamadı.");
+                throw new FormatException($"{satirlar.Length + 1}. satır: Beklenen veri bulunamadı.");
             }
 
-            string[] boyut = SonrakiSatir()
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] boyut = SonrakiSatir().Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             if (boyut.Length != 3 || boyut[0] != "BOYUT" ||
                 !int.TryParse(boyut[1], out int genislik) ||
                 !int.TryParse(boyut[2], out int yukseklik) ||
                 genislik <= 0 || yukseklik <= 0)
             {
-                throw new FormatException(
-                    $"{index}. satır: Geçersiz BOYUT tanımı.");
+                throw new FormatException($"{index}. satır: Geçersiz BOYUT tanımı.");
             }
 
             Harita harita = new Harita(genislik, yukseklik);

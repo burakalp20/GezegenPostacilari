@@ -121,6 +121,7 @@ SOL
 ILERI 11
 ```
 
+
 ## 📌 Geliştirme Durumu
 
 - [x] Proje ve klasör yapısının oluşturulması
@@ -128,12 +129,18 @@ ILERI 11
 - [x] Temel OOP mimarisinin hazırlanması
 - [x] Harita dosyasının okunması
 - [x] Temel dosya doğrulama kontrolleri
-- [x] Zemin sınıflarının ve enerji maliyetlerinin tanımlanması
-- [ ] Hareket komutlarının uygulanması
-- [ ] Özel zemin davranışlarının tamamlanması
-- [ ] Simülasyon sonuçlarının oluşturulması
-- [ ] Yeni robot ve zemin türlerinin eklenmesi
+- [x] Zemin sınıfları ve enerji maliyetlerinin tanımlanması
+- [x] Temel hareket komutlarının oluşturulması
+- [x] Sağa ve sola dönüş işlemleri
+- [x] Harita sınırı, engel ve robot çarpışma kontrolleri
+- [x] Temel hareket ve dönüş testleri
+- [ ] Zeminlere özgü enerji tüketiminin uygulanması
+- [ ] Sıçrama, kayma ve savrulma davranışları
+- [ ] Komut dosyasının okunması ve sırayla uygulanması
+- [ ] Nihai simülasyon çıktılarının oluşturulması
+- [ ] Özgün robot ve zemin türlerinin eklenmesi
 - [ ] Kapsamlı testler ve son düzenlemeler
+
 
 
 *Bu proje geliştirme aşamasındadır. Yeni özellikler, iyileştirmeler ve testler ilerleyen güncellemelerle eklenecektir.*
