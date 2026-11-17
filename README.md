@@ -134,13 +134,34 @@ ILERI 11
 - [x] Sağa ve sola dönüş işlemleri
 - [x] Harita sınırı, engel ve robot çarpışma kontrolleri
 - [x] Temel hareket ve dönüş testleri
-- [ ] Zeminlere özgü enerji tüketiminin uygulanması
-- [ ] Sıçrama, kayma ve savrulma davranışları
-- [ ] Komut dosyasının okunması ve sırayla uygulanması
-- [ ] Nihai simülasyon çıktılarının oluşturulması
-- [ ] Özgün robot ve zemin türlerinin eklenmesi
+- [x] Zeminlere özgü enerji tüketiminin uygulanması
+- [x] Sıçrama, kayma ve savrulma davranışları
+- [x] Komut dosyasının okunması ve sırayla uygulanması
+- [x] Nihai simülasyon çıktılarının oluşturulması
+- [x] Özgün robot ve zemin türlerinin eklenmesi
 - [ ] Kapsamlı testler ve son düzenlemeler
 
 
 
-*Bu proje geliştirme aşamasındadır. Yeni özellikler, iyileştirmeler ve testler ilerleyen güncellemelerle eklenecektir.*
+## Gün 7 — Özgün gövde ve zemin
+
+Özgün tasarım kararları aşağıda tanımlanmıştır. Bunlar standart zeminlerin şartnamedeki kurallarına ek olarak uygulanır.
+
+- HIBRIT gövde hem sıçrayabilir hem kayabilir. Uçamaz. Kayayı 2 enerjiyle atlar ve kesintisiz buz üzerinde 1 enerjiyle kayar. Tozdan 2 enerjiyle geçer, metan gölüne giremez.
+- B sembollü bataklıktan uçabilen gövdeler 1, diğer gövdeler 3 enerjiyle geçer. Bataklık sıçrama inişine uygun değildir. Kayma bataklığa geçmeden son buz hücresinde biter.
+- Hibrit kaya üzerinden buza indiğinde sıçrama sonlanır. İniş kendi başına ikinci bir kayma başlatmaz. Sonraki adımda önündeki buz hücresine giriş kaymayı başlatır.
+- Enerji yetmediğinde hareket gerçekleşmez ve robot ENERJISIZ olur. Engellenen sıçrama enerji harcamaz.
+
+Gövde ve zemin sınıfları davranışlarını kendi sınıflarında tanımlar. Dosya tanımları GovdeFabrikasi ve ZeminFabrikasi kayıtlarında tutulur. Yeni türler eklendiğinde ilgili kayda eklenir; HaritaOkuyucu bu kayıtlardan doğrulama yapar.
+
+Proje klasöründen örneği çalıştırmak için:
+
+```powershell
+dotnet run -- "TestData/harita_gun7.txt" "TestData/komutlar_gun7.txt"
+```
+
+Beş robot da teslim eder. HIBRIT, SICRAYAN, KIZAKLI, HAVALI ve PALETLI için kalan enerjiler sırasıyla 11, 8, 9, 12 ve 6 olur. Toplam kalan enerji 46'dır.
+
+Standart haritanın üç referans senaryosu doğrulanmıştır: ILERI 11 için 2 teslim/43 enerji, beş komutlu örnek için 3 teslim/33 enerji ve dönüşlü örnek için 4 teslim/26 enerji.
+
+*Arayüz, kapsamlı sınır durumu testleri, UML ve teslim raporu hazırlığı devam etmektedir.*

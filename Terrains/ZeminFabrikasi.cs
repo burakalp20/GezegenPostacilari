@@ -15,8 +15,14 @@ namespace GezegenPostacilari.Terrains
                 ['~'] = new MetanGolu(),
                 ['I'] = new BuzKabugu(),
                 ['X'] = new Engel(),
-                ['H'] = new TeslimRampasi()
+                ['H'] = new TeslimRampasi(),
+                ['B'] = new Bataklik()
             };
+
+        public static bool TanimliMi(char sembol)
+        {
+            return Zeminler.ContainsKey(sembol);
+        }
 
         public static Zemin Olustur(char sembol)
         {

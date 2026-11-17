@@ -5,6 +5,7 @@ using System.IO;
 using GezegenPostacilari.Models;
 using GezegenPostacilari.Robots;
 using GezegenPostacilari.Simulation;
+using GezegenPostacilari.Terrains;
 
 namespace GezegenPostacilari.Parsers
 {
@@ -80,15 +81,12 @@ namespace GezegenPostacilari.Parsers
                         $"{index}. satır: Robot numarası tekrar ediyor.");
                 }
 
-                RobotGovdesi govde = parcalar[2] switch
+                if (!GovdeFabrikasi.TanimliMi(parcalar[2]))
                 {
-                    "PALETLI" => new PaletliGovde(),
-                    "SICRAYAN" => new SicrayanGovde(),
-                    "HAVALI" => new HavaliGovde(),
-                    "KIZAKLI" => new KizakliGovde(),
-                    _ => throw new FormatException(
-                        $"{index}. satır: Bilinmeyen robot gövdesi.")
-                };
+                    throw new FormatException(
+                        $"{index}. satır: Bilinmeyen robot gövdesi.");
+                }
+                RobotGovdesi govde = GovdeFabrikasi.Olustur(parcalar[2]);
 
                 govdeler.Add(numara, govde);
             }
@@ -109,10 +107,7 @@ namespace GezegenPostacilari.Parsers
                 {
                     char karakter = satir[x];
 
-                    if (karakter == '.' || karakter == 'T' ||
-                        karakter == 'K' || karakter == '~' ||
-                        karakter == 'I' || karakter == 'X' ||
-                        karakter == 'H')
+                    if (ZeminFabrikasi.TanimliMi(karakter))
                     {
                         harita.HucreAyarla(x, y, karakter);
                     }

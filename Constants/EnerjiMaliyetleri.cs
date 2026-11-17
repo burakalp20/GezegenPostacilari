@@ -27,5 +27,7 @@ namespace GezegenPostacilari.Constants
         public const int BuzKayma = 1;
 
         public const int Teslim = 1;
+        public const int BataklikNormal = 3;
+        public const int BataklikHavali = 1;
     }
 }
