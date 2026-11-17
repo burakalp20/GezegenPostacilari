@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using GezegenPostacilari.Models;
 using GezegenPostacilari.Robots;
+using GezegenPostacilari.Commands;
+using System.Linq;
 
 namespace GezegenPostacilari.Simulation
 {
@@ -15,6 +17,22 @@ namespace GezegenPostacilari.Simulation
         {
             Harita = harita ?? throw new ArgumentNullException(nameof(harita));
             Robotlar = robotlar ?? throw new ArgumentNullException(nameof(robotlar));
+        }
+
+        public void Calistir(IReadOnlyList<Komut> komutlar)
+        {
+            ArgumentNullException.ThrowIfNull(komutlar);
+            List<Robot> siraliRobotlar = Robotlar.OrderBy(robot => robot.Numara).ToList();
+            foreach (Komut komut in komutlar)
+            {
+                foreach (Robot robot in siraliRobotlar)
+                {
+                    if (robot.Durum == RobotDurumu.AKTIF)
+                    {
+                        komut.Uygula(robot, this);
+                    }
+                }
+            }
         }
 
         public bool HucreDoluMu(int x, int y, Robot hareketEden)

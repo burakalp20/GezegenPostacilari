@@ -1,58 +1,43 @@
-﻿
-using System;
-using System.IO;
 using GezegenPostacilari.Commands;
+using GezegenPostacilari.Models;
 using GezegenPostacilari.Parsers;
 using GezegenPostacilari.Robots;
 using GezegenPostacilari.Simulation;
 
-try
+// Giriş dosyalarını doğrular, simülasyonu çalıştırır ve sonuçları ekrana yazar.
+internal static class Program
 {
-    // Harita dosyasını okuyarak simülasyon ortamını oluşturur.
-    string dosyaYolu = Path.Combine(
-        AppContext.BaseDirectory, "TestData", "harita.txt");
-
-    HaritaOkuyucu okuyucu = new HaritaOkuyucu();
-    var veri = okuyucu.Oku(dosyaYolu);
-
-    Simulasyon simulasyon = new Simulasyon(
-        veri.Harita, veri.Robotlar);
-
-    Console.WriteLine("BASLANGIC DURUMU");
-
-    foreach (Robot robot in simulasyon.Robotlar)
+    private static int Main(string[] args)
     {
-        Console.WriteLine(
-            $"ROBOT {robot.Numara} KONUM " +
-            $"{robot.Konum.X} {robot.Konum.Y} " +
-            $"YON {robot.Yon} ENERJI {robot.Enerji}");
+        try
+        {
+            if (args.Length != 0 && args.Length != 2)
+            {
+                throw new ArgumentException("Kullanım: GezegenPostacilari <harita.txt> <komutlar.txt>");
+            }
+            string haritaYolu = args.Length == 2 ? args[0]
+                : Path.Combine(AppContext.BaseDirectory, "TestData", "harita.txt");
+            string komutYolu = args.Length == 2 ? args[1]
+                : Path.Combine(AppContext.BaseDirectory, "TestData", "komutlar.txt");
+            HaritaVerisi veri = new HaritaOkuyucu().Oku(haritaYolu);
+            List<Komut> komutlar = new KomutOkuyucu().Oku(komutYolu);
+            Simulasyon simulasyon = new Simulasyon(veri.Harita, veri.Robotlar);
+            simulasyon.Calistir(komutlar);
+            foreach (Robot robot in simulasyon.Robotlar.OrderBy(robot => robot.Numara))
+            {
+                Console.WriteLine(
+                    $"ROBOT {robot.Numara} {robot.Govde.Ad} KONUM {robot.Konum.X} {robot.Konum.Y} " +
+                    $"YON {robot.Yon} ENERJI {robot.Enerji} DURUM {robot.Durum}");
+            }
+            Console.WriteLine($"TESLIM {simulasyon.Robotlar.Count(robot => robot.Durum == RobotDurumu.TESLIM)}");
+            Console.WriteLine($"KALAN_ENERJI {simulasyon.Robotlar.Sum(robot => (long)robot.Enerji)}");
+            return 0;
+        }
+        catch (Exception hata) when (hata is FormatException ||
+            hata is ArgumentException || hata is IOException || hata is UnauthorizedAccessException)
+        {
+            Console.Error.WriteLine($"HATA: {hata.Message}");
+            return 1;
+        }
     }
-
-    Console.WriteLine();
-
-    Komut ileri = new IleriKomutu(1);
-    Komut sag = new SagKomutu();
-    Komut sol = new SolKomutu();
-
-    // Komutları robot numarası sırasıyla uygular.
-    foreach (Robot robot in simulasyon.Robotlar)
-    {
-        ileri.Uygula(robot, simulasyon);
-        sag.Uygula(robot, simulasyon);
-        sol.Uygula(robot, simulasyon);
-    }
-
-    Console.WriteLine("KOMUTLAR SONRASI");
-
-    foreach (Robot robot in simulasyon.Robotlar)
-    {
-        Console.WriteLine(
-            $"ROBOT {robot.Numara} KONUM " +
-            $"{robot.Konum.X} {robot.Konum.Y} " +
-            $"YON {robot.Yon} ENERJI {robot.Enerji}");
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"HATA: {ex.Message}");
 }
