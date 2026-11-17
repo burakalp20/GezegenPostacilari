@@ -10,6 +10,7 @@ namespace GezegenPostacilari.Constants
     // Zemin ve özel hareketlerin enerji maliyetlerini merkezi olarak tanımlar.
     public static class EnerjiMaliyetleri
     {
+        public const int GecisYok = 0;
         public const int Duz = 1;
 
         public const int TozNormal = 2;

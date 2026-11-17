@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
 using GezegenPostacilari.Constants;
 using GezegenPostacilari.Robots;
 
 namespace GezegenPostacilari.Terrains
 {
-    // Metan gölünden yalnızca uçabilen robotların geçebilmesini sağlar.
+    // Metan gölünden yalnızca uçabilen robotların geçmesini sağlar.
     public class MetanGolu : Zemin
     {
         public override char Sembol => '~';
+        public override bool SicramaInisineUygunMu => false;
 
         public override bool GecilebilirMi(RobotGovdesi govde)
         {

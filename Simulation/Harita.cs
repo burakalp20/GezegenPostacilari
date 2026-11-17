@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using System;
+using GezegenPostacilari.Terrains;
 
 namespace GezegenPostacilari.Simulation
 {
-    // Haritanın boyutlarını ve hücrelerdeki karakterleri saklar.
+    // Haritanın boyutlarını ve hücrelerdeki zeminleri saklar.
     public class Harita
     {
-        private readonly char[,] hucreler;
+        private readonly Zemin[,] zeminler;
 
         public int Genislik { get; }
         public int Yukseklik { get; }
@@ -18,28 +14,45 @@ namespace GezegenPostacilari.Simulation
         public Harita(int genislik, int yukseklik)
         {
             if (genislik <= 0 || yukseklik <= 0)
+            {
                 throw new ArgumentException("Harita boyutları pozitif olmalıdır.");
+            }
 
             Genislik = genislik;
             Yukseklik = yukseklik;
-
-            hucreler = new char[yukseklik, genislik];
+            zeminler = new Zemin[yukseklik, genislik];
         }
 
         public void HucreAyarla(int x, int y, char karakter)
         {
             if (!SinirlarIcinde(x, y))
+            {
                 throw new ArgumentOutOfRangeException();
+            }
 
-            hucreler[y, x] = karakter;
+            zeminler[y, x] = ZeminFabrikasi.Olustur(karakter);
         }
 
         public char HucreGetir(int x, int y)
         {
-            if (!SinirlarIcinde(x, y))
-                throw new ArgumentOutOfRangeException();
+            return ZeminGetir(x, y).Sembol;
+        }
 
-            return hucreler[y, x];
+        public Zemin ZeminGetir(int x, int y)
+        {
+            if (!SinirlarIcinde(x, y))
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
+            Zemin? zemin = zeminler[y, x];
+
+            if (zemin is null)
+            {
+                throw new InvalidOperationException("Harita hücresi henüz tanımlanmadı.");
+            }
+
+            return zemin;
         }
 
         public bool SinirlarIcinde(int x, int y)
