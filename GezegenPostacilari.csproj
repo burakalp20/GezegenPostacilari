@@ -8,16 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestData\harita.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="TestData\komutlar.txt">
+    <Compile Remove="Tests\**\*.cs" />
+    <None Update="TestData\*.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\harita.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 using GezegenPostacilari.Constants;
 using GezegenPostacilari.Robots;
+using System.Runtime.CompilerServices;
 
 namespace GezegenPostacilari.Terrains
 {
@@ -8,6 +9,12 @@ namespace GezegenPostacilari.Terrains
     {
         public override char Sembol => 'B';
         public override bool SicramaInisineUygunMu => false;
+
+        [ModuleInitializer]
+        internal static void KayitOl()
+        {
+            ZeminFabrikasi.Kaydet(new Bataklik());
+        }
 
         public override int EnerjiMaliyeti(RobotGovdesi govde)
         {

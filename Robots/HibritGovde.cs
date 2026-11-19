@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace GezegenPostacilari.Robots
 {
     // Kaya üzerinden sıçrama ve buz üzerinde kayma yeteneklerini birleştirir.
@@ -6,5 +8,11 @@ namespace GezegenPostacilari.Robots
         public override string Ad => "HIBRIT";
         public override bool Sicrayabilir => true;
         public override bool Kayabilir => true;
+
+        [ModuleInitializer]
+        internal static void KayitOl()
+        {
+            GovdeFabrikasi.Kaydet(new HibritGovde());
+        }
     }
 }

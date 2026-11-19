@@ -152,7 +152,7 @@ ILERI 11
 - Hibrit kaya üzerinden buza indiğinde sıçrama sonlanır. İniş kendi başına ikinci bir kayma başlatmaz. Sonraki adımda önündeki buz hücresine giriş kaymayı başlatır.
 - Enerji yetmediğinde hareket gerçekleşmez ve robot ENERJISIZ olur. Engellenen sıçrama enerji harcamaz.
 
-Gövde ve zemin sınıfları davranışlarını kendi sınıflarında tanımlar. Dosya tanımları GovdeFabrikasi ve ZeminFabrikasi kayıtlarında tutulur. Yeni türler eklendiğinde ilgili kayda eklenir; HaritaOkuyucu bu kayıtlardan doğrulama yapar.
+Gövde ve zemin sınıfları davranışlarını kendi sınıflarında tanımlar. Dosya tanımları GovdeFabrikasi ve ZeminFabrikasi kayıtlarında tutulur. Özgün türler kendi sınıflarındaki ModuleInitializer işaretli metotla kaydolur; HaritaOkuyucu bu kayıtlardan doğrulama yapar.
 
 Proje klasöründen örneği çalıştırmak için:
 
@@ -164,4 +164,81 @@ Beş robot da teslim eder. HIBRIT, SICRAYAN, KIZAKLI, HAVALI ve PALETLI için ka
 
 Standart haritanın üç referans senaryosu doğrulanmıştır: ILERI 11 için 2 teslim/43 enerji, beş komutlu örnek için 3 teslim/33 enerji ve dönüşlü örnek için 4 teslim/26 enerji.
 
-*Arayüz, kapsamlı sınır durumu testleri, UML ve teslim raporu hazırlığı devam etmektedir.*
+## Gün 8 — Konsol görünümü ve giriş doğrulama
+
+Koordinatlı konsol görünümü, başlangıçta ve her komut bütün robotlar tarafından tamamlandığında haritayı gösterir. Robotlar numaralarıyla görünür. Alt bölümde gövde, konum, yön, enerji, durum ve robotun bulunduğu zemin listelenir. Teslim edilen robot haritadan kalkar; enerjisiz robot hücresinde görünmeye devam eder.
+
+Varsayılan dosyalarla:
+
+```powershell
+dotnet run -- --goster
+```
+
+Özgün gövde ve zemin örneğiyle:
+
+```powershell
+dotnet run -- "TestData/harita_gun7.txt" "TestData/komutlar_gun7.txt" --goster
+```
+
+Dosya yolları proje klasörüne göre verilmiştir. --goster seçeneği son argüman olmalıdır. Görünüm, komut sonlarındaki durumları art arda yazar; tuşla bekleme veya animasyon içermez.
+
+Görünüm Console.Error üzerinden, şartnamedeki robot sonuçları ve toplamlar Console.Out üzerinden yazılır. İkisi konsolda birlikte izlenebilir; standart çıktıya yönlendirilen sonuç dosyası yalnızca resmi sonuçları içerir. --goster verilmediğinde yalnızca sonuç yazılır. Hatalı girişte görünüm açılmadan hata bildirilir.
+
+Harita satırlarından sonraki boş satırlar ve # ile başlayan açıklamalar kabul edilir. Diğer fazla veriler satır numarasıyla reddedilir. Haritada başlangıç konumu bulunmayan robot için tanım satırı raporlanır.
+
+Gün 8 doğrulamasında 19 kontrol geçti: üç standart referans senaryo, özgün harita, görünümün sonuç çıktısını koruması, komut sonrası görüntüler, teslim ve enerjisiz robotların gösterimi, hatalı/eksik harita verileri, boş komutlar ve seçenek doğrulaması.
+
+## Gün 9 — Tekrarlanabilir doğrulama
+
+Tests/GezegenPostacilari.Dogrulama.csproj standart .NET sınıflarıyla çalışan bir C# konsol doğrulama projesidir. Visual Studio çözümüne eklenmiştir. Testleri proje klasöründen çalıştırın:
+
+```powershell
+dotnet run --project Tests/GezegenPostacilari.Dogrulama.csproj
+```
+
+Başarılı çalışmanın son satırı:
+
+```text
+SONUC: 122 başarılı, 0 başarısız.
+```
+
+Başarılı çalıştırma 0, herhangi bir testin başarısız olması 1 çıkış kodu verir. Her test adı ve hata ayrıntısı yazılır; başarısız bir test diğer senaryoların çalışmasını durdurmaz. Beklenen maliyetler uygulamadaki sabitlerden kopyalanmadan test tablosunda tanımlanmıştır.
+
+| Test grubu | Senaryo sayısı |
+|---|---:|
+| Beş gövde ve sekiz zemin kombinasyonu | 40 |
+| Dört yönde normal hareket, sıçrama ve kayma | 16 |
+| Enerji, sınır, çarpışma, teslim ve özel hareketler | 34 |
+| Harita ve komut dosyaları | 26 |
+| Üç standart referans ve özgün harita | 4 |
+| Görünümün durumu koruması ve komut sonrası bildirim | 2 |
+
+İlk test koşusunda harita hücre satırlarının başında veya sonunda fazladan boşluk olduğunda geçersiz satırların kabul edildiği bulundu. HaritaOkuyucu artık hücre satırını kırpmadan genişlik ve sembol kontrolüne sokar. Başlıkların boşluk temizliği, boş satırların ve açıklamaların atlanması devam eder. Bu iki durum düzeltme sonrasında geçti.
+
+Yorum gerektiren birleşik kural: mevcut uygulama kayanın üzerinden doğrudan H rampasına sıçramayı toplam 2 enerjiyle teslim olarak ele alır. Şartnamedeki standart örnekler bu birleşik durumun maliyetini doğrulamaz. İlgili iki test mevcut yorumun değişmeden kaldığını kontrol eder; öğretim görevlisinin farklı açıklaması olursa kural ve beklentiler birlikte güncellenmelidir. Hibritin buza sıçrayarak inişi aynı adımda ikinci bir kayma başlatmaz; bu, özgün gövde için belirlenen kuraldır.
+
+Test projesi kendi örnek dosyalarını çıktı klasörüne alır. Geçici dosya testleri oluşturdukları dosyayı işlem sonunda siler. Ana projedeki Compile Remove ayarı test kaynaklarının ana uygulamaya derlenmesini engeller.
+
+## Şartname denetimi sonrası düzenlemeler
+
+Yeni gövde ve zemin eklemek için fabrika sınıflarındaki kaynak listelerini değiştirmek gerekmiyor. HibritGovde ve Bataklik, kendi dosyalarında bulunan ModuleInitializer işaretli statik KayitOl metotlarıyla kaydolur. C# çalışma zamanı bu metotları modül başlangıcında çağırır. Yeni bir alt sınıf aynı yöntemi kullanarak kendi adını veya sembolünü Kaydet metoduna iletebilir. Ana okuyucu, hareket motoru ve Program sınıfı yeni tür için değiştirilmez.
+
+Fabrikalar boş adları, dosya biçimiyle çakışan sembolleri ve yinelenen kayıtları reddeder. Başarısız bir kayıt mevcut türün üzerine yazmaz. Kayıt erişimleri kilitle korunur. Gövde ve zeminler paylaşılan kural nesneleridir; robota özel değişken durum Robot içinde tutulmalıdır.
+
+Konsoldaki zemin açıklamaları kayıtlı zeminlerden oluşturulur ve üçlü gruplar halinde yazılır. Yeni zemin eklendiğinde görünüm sınıfının açıklama listesine ayrıca satır eklenmez. Görünümde sınıf adı yalnızca açıklama etiketi olarak kullanılır; hareket davranışı seçmek için kullanılmaz.
+
+Programın çıktı kodlaması UTF-8 olarak belirlenmiştir. Bu, özellikle yönlendirilmiş Türkçe hata mesajlarının doğru okunmasını sağlar.
+
+Kayıt düzenlemesi sonrasında 145 senaryo başarıyla doğrulanmıştır. Gün 9'daki 122 senaryoya, kayıt sistemini sınayan 20 test ve ana programı ayrı süreçte çalıştıran 3 test eklenmiştir. DenemeGovdesi ve DenemeZemini yalnızca test projesinde bulunur. Bu dosyalar yeni türün otomatik kaydını, dosyadan okunmasını, mevcut gövde/zeminlerle çalışmasını ve görünümde gösterilmesini doğrular. Ayrı süreç testleri resmi çıktının tam metnini, hibrit/bataklık kaydını, görünüm açıkken standart çıktının korunmasını ve geçersiz komutta simülasyonun başlamamasını kontrol eder.
+
+Rampaya doğrudan sıçramanın toplam maliyeti için proje klasöründeki belgelerde ek bir açıklama bulunmamıştır. Mevcut 2 enerji yorumu korunur; bu birleşimin resmi referansla uyumu henüz doğrulanmış değildir.
+
+## Temiz derleme ve çalıştırma kontrolü
+
+Güncel test sonucu 148 başarılı, 0 başarısızdır. Büyük fakat dosya içeriğiyle tutarsız genişlik/yükseklik tanımları için üç kontrol daha eklenmiştir. HaritaOkuyucu önce hücre satırlarını, robot tanımlarını ve dosyanın sonunu doğrular; iki boyutlu harita dizisini bu kontrollerden sonra oluşturur. Böylece kısa bir hatalı dosyanın aşırı büyük boyut bildirerek gereksiz dizi tahsisi başlatması önlenir.
+
+TestData klasöründeki bütün TXT örnekleri hem derleme hem yayın çıktısına kopyalanır. Hibrit ve bataklık örneği de dağıtım klasöründen çalıştırılabilir.
+
+Kaynak dosyalar eski bin/obj klasörleri olmadan ayrı bir klasöre kopyalanıp Release olarak derlenmiştir. Derleme 0 hata ve 0 uyarıyla tamamlanmış, 148 test bu kopyada da geçmiştir. Yayın çıktısından standart örnek 3 teslim/33 enerji, özgün örnek 5 teslim/46 enerji üretmiştir. --goster ile başlangıç ve komut sonrası haritalar kontrol edilmiştir. Bu yayın biçimi çalıştırılan bilgisayarda .NET 8 çalışma ortamı gerektirir.
+
+*UML ve IEEE teslim raporu sonraki aşamaya bırakılmıştır. Test sayısı bütün olası haritaların doğrulandığı anlamına gelmez.*

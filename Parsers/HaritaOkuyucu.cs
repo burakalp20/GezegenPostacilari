@@ -17,16 +17,17 @@ namespace GezegenPostacilari.Parsers
             string[] satirlar = File.ReadAllLines(dosyaYolu);
             int index = 0;
 
-            string SonrakiSatir()
+            string SonrakiSatir(bool kenarlariKirp = true)
             {
                 while (index < satirlar.Length)
                 {
-                    string satir = satirlar[index++].Trim();
+                    string hamSatir = satirlar[index++];
+                    string satir = hamSatir.Trim();
 
                     if (satir.Length == 0 || satir.StartsWith("#"))
                         continue;
 
-                    return satir;
+                    return kenarlariKirp ? satir : hamSatir;
                 }
 
                 throw new FormatException($"{satirlar.Length + 1}. satır: Beklenen veri bulunamadı.");
@@ -42,8 +43,6 @@ namespace GezegenPostacilari.Parsers
                 throw new FormatException($"{index}. satır: Geçersiz BOYUT tanımı.");
             }
 
-            Harita harita = new Harita(genislik, yukseklik);
-
             string[] enerji = SonrakiSatir()
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -56,6 +55,7 @@ namespace GezegenPostacilari.Parsers
             }
 
             Dictionary<int, RobotGovdesi> govdeler = new();
+            Dictionary<int, int> robotTanimSatirlari = new Dictionary<int, int>();
 
             while (true)
             {
@@ -89,13 +89,15 @@ namespace GezegenPostacilari.Parsers
                 RobotGovdesi govde = GovdeFabrikasi.Olustur(parcalar[2]);
 
                 govdeler.Add(numara, govde);
+                robotTanimSatirlari.Add(numara, index);
             }
 
             Dictionary<int, Konum> konumlar = new();
+            List<string> hucreSatirlari = new List<string>();
 
             for (int y = 0; y < yukseklik; y++)
             {
-                string satir = SonrakiSatir();
+                string satir = SonrakiSatir(kenarlariKirp: false);
 
                 if (satir.Length != genislik)
                 {
@@ -107,11 +109,7 @@ namespace GezegenPostacilari.Parsers
                 {
                     char karakter = satir[x];
 
-                    if (ZeminFabrikasi.TanimliMi(karakter))
-                    {
-                        harita.HucreAyarla(x, y, karakter);
-                    }
-                    else if (karakter >= '1' && karakter <= '9')
+                    if (karakter >= '1' && karakter <= '9')
                     {
                         int numara = karakter - '0';
 
@@ -128,13 +126,23 @@ namespace GezegenPostacilari.Parsers
                         }
 
                         konumlar.Add(numara, new Konum(x, y));
-                        harita.HucreAyarla(x, y, '.');
                     }
-                    else
+                    else if (!ZeminFabrikasi.TanimliMi(karakter))
                     {
                         throw new FormatException(
                             $"{index}. satır: Geçersiz harita karakteri.");
                     }
+                }
+                hucreSatirlari.Add(satir);
+            }
+
+            while (index < satirlar.Length)
+            {
+                string kalanSatir = satirlar[index++].Trim();
+                if (kalanSatir.Length != 0 && !kalanSatir.StartsWith("#", StringComparison.Ordinal))
+                {
+                    throw new FormatException(
+                        $"{index}. satır: Harita sonrasında beklenmeyen veri.");
                 }
             }
 
@@ -145,7 +153,7 @@ namespace GezegenPostacilari.Parsers
                 if (!konumlar.ContainsKey(numara))
                 {
                     throw new FormatException(
-                        $"Robot {numara} için başlangıç konumu bulunamadı.");
+                        $"{robotTanimSatirlari[numara]}. satır: Robot {numara} için başlangıç konumu bulunamadı.");
                 }
 
                 robotlar.Add(new Robot(
@@ -156,6 +164,17 @@ namespace GezegenPostacilari.Parsers
             }
 
             robotlar.Sort((a, b) => a.Numara.CompareTo(b.Numara));
+
+            Harita harita = new Harita(genislik, yukseklik);
+            for (int satirSirasi = 0; satirSirasi < yukseklik; satirSirasi++)
+            {
+                for (int sutunSirasi = 0; sutunSirasi < genislik; sutunSirasi++)
+                {
+                    char sembol = hucreSatirlari[satirSirasi][sutunSirasi];
+                    char zeminSembolu = sembol >= '1' && sembol <= '9' ? '.' : sembol;
+                    harita.HucreAyarla(sutunSirasi, satirSirasi, zeminSembolu);
+                }
+            }
 
             return new HaritaVerisi(harita, baslangicEnerjisi, robotlar);
         }

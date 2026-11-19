@@ -21,8 +21,14 @@ namespace GezegenPostacilari.Simulation
 
         public void Calistir(IReadOnlyList<Komut> komutlar)
         {
+            Calistir(komutlar, null);
+        }
+
+        public void Calistir(IReadOnlyList<Komut> komutlar, Action<int>? komutSonrasi)
+        {
             ArgumentNullException.ThrowIfNull(komutlar);
             List<Robot> siraliRobotlar = Robotlar.OrderBy(robot => robot.Numara).ToList();
+            int tamamlananKomut = 0;
             foreach (Komut komut in komutlar)
             {
                 foreach (Robot robot in siraliRobotlar)
@@ -32,6 +38,8 @@ namespace GezegenPostacilari.Simulation
                         komut.Uygula(robot, this);
                     }
                 }
+                tamamlananKomut++;
+                komutSonrasi?.Invoke(tamamlananKomut);
             }
         }
 

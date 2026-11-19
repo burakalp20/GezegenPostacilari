@@ -5,12 +5,18 @@ VisualStudioVersion = 17.14.36310.24 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GezegenPostacilari", "GezegenPostacilari.csproj", "{8FCB4C7B-0EF3-4D76-A87D-0FB69976FAB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GezegenPostacilari.Dogrulama", "Tests\GezegenPostacilari.Dogrulama.csproj", "{52728F28-6FA6-4798-839C-17F44B05CE5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52728F28-6FA6-4798-839C-17F44B05CE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52728F28-6FA6-4798-839C-17F44B05CE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52728F28-6FA6-4798-839C-17F44B05CE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52728F28-6FA6-4798-839C-17F44B05CE5A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8FCB4C7B-0EF3-4D76-A87D-0FB69976FAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8FCB4C7B-0EF3-4D76-A87D-0FB69976FAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FCB4C7B-0EF3-4D76-A87D-0FB69976FAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU

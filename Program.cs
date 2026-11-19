@@ -3,6 +3,8 @@ using GezegenPostacilari.Models;
 using GezegenPostacilari.Parsers;
 using GezegenPostacilari.Robots;
 using GezegenPostacilari.Simulation;
+using GezegenPostacilari.Presentation;
+using System.Text;
 
 // Giriş dosyalarını doğrular, simülasyonu çalıştırır ve sonuçları ekrana yazar.
 internal static class Program
@@ -11,18 +13,34 @@ internal static class Program
     {
         try
         {
-            if (args.Length != 0 && args.Length != 2)
+            Console.OutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            bool gorunumAcik = args.Length > 0 && args[^1] == "--goster";
+            int dosyaSayisi = args.Length - (gorunumAcik ? 1 : 0);
+            if ((dosyaSayisi != 0 && dosyaSayisi != 2) ||
+                args.Take(dosyaSayisi).Any(arguman => arguman.StartsWith("--", StringComparison.Ordinal)))
             {
-                throw new ArgumentException("Kullanım: GezegenPostacilari <harita.txt> <komutlar.txt>");
+                throw new ArgumentException(
+                    "Kullanım: GezegenPostacilari [<harita.txt> <komutlar.txt>] [--goster]");
             }
-            string haritaYolu = args.Length == 2 ? args[0]
+            string haritaYolu = dosyaSayisi == 2 ? args[0]
                 : Path.Combine(AppContext.BaseDirectory, "TestData", "harita.txt");
-            string komutYolu = args.Length == 2 ? args[1]
+            string komutYolu = dosyaSayisi == 2 ? args[1]
                 : Path.Combine(AppContext.BaseDirectory, "TestData", "komutlar.txt");
             HaritaVerisi veri = new HaritaOkuyucu().Oku(haritaYolu);
             List<Komut> komutlar = new KomutOkuyucu().Oku(komutYolu);
             Simulasyon simulasyon = new Simulasyon(veri.Harita, veri.Robotlar);
-            simulasyon.Calistir(komutlar);
+            if (gorunumAcik)
+            {
+                KonsolGorunumu gorunum = new KonsolGorunumu();
+                gorunum.Yaz(simulasyon, Console.Error, "BASLANGIC");
+                simulasyon.Calistir(komutlar, tamamlananKomut =>
+                    gorunum.Yaz(simulasyon, Console.Error,
+                        $"KOMUT {tamamlananKomut}/{komutlar.Count} SONRASI"));
+            }
+            else
+            {
+                simulasyon.Calistir(komutlar);
+            }
             foreach (Robot robot in simulasyon.Robotlar.OrderBy(robot => robot.Numara))
             {
                 Console.WriteLine(
